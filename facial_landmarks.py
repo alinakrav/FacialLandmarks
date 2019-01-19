@@ -1,3 +1,6 @@
+# this just shows the landmarks of all faces in a given image
+# usage: python3 facial_landmarks.py --i example_01.jpg
+
 # import the necessary packages
 from imutils import face_utils
 import numpy as np

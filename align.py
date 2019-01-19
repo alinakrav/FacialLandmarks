@@ -1,4 +1,6 @@
 # This combines the facial alignment class and the facial landmark detection class from pyimagesearch.com's API
+# Shows landmarks of a face present in a given image, after it aligns it to be straight
+# usage: python3 align.py --i example_01.jpg
 
 # import the necessary packages
 from imutils import face_utils
@@ -30,24 +32,26 @@ fa = FaceAligner(predictor, (0.35,0.35), 350)
 
 # load the input image, resize it, and convert it to grayscale
 image = cv2.imread("images/" + args["image"])
-image = imutils.resize(image, width=500)
+image = imutils.resize(image, width=700)
+cv2.imshow("original", image)
 
 # cv2.imshow("original", image)
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 # detect faces in the grayscale image
 rects = detector(gray, 1)
-
 # loop over the face detections
 for (i, rect) in enumerate(rects):
 	######### added this
 	faceAligned = fa.align(image, gray, rect)
+	gray = cv2.cvtColor(faceAligned, cv2.COLOR_BGR2GRAY)
+	rect = detector(gray, 1)[0]
 	# determine the facial landmarks for the face region, then
 	# convert the facial landmark (x, y)-coordinates to a NumPy
 	# array
 	# shape = predictor(gray, rect)
-	wholeBox = (dlib.rectangle(left=0, top=0, right=faceAligned.shape[0], bottom=faceAligned.shape[1]))
-	shape = predictor(faceAligned, wholeBox)
+	# wholeBox = (dlib.rectangle(left=0, top=0, right=faceAligned.shape[0], bottom=faceAligned.shape[1]))
+	shape = predictor(gray, rect)
 	shape = face_utils.shape_to_np(shape)
 
 	# convert dlib's rectangle to a OpenCV-style bounding box
@@ -70,8 +74,7 @@ for (i, rect) in enumerate(rects):
 	cv2.rectangle(faceAligned, (0,0), (faceAligned.shape[0], faceAligned.shape[1]), (255,255,255),-1)
 	for (x, y) in shape:
 		cv2.circle(faceAligned, (x, y), 2, (0, 0, 255), -1)
+	cv2.imshow("Output {}".format(i), faceAligned)
 #
 # # show the output image with the face detections + facial landmarks
-cv2.imshow("original", image)
-cv2.imshow("Output", faceAligned)
 cv2.waitKey(0)
